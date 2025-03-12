@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> 故障排查系统 </title>
+    <title>故障排查系统</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -145,10 +145,17 @@
     <script>
         // 初始密码
         const adminPassword = 'bybon123';
-        // 从 localStorage 获取用户密码，如果没有则使用默认值
-        let userPassword = localStorage.getItem('userPassword') || '1234';
+        // 从 localStorage 获取用户密码，如果没有则提示管理员设置
+        let userPassword = localStorage.getItem('userPassword');
 
-        // 登录函数
+        if (!userPassword) {
+            alert("请管理员设置初始密码！");
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('changePasswordForm').style.display = 'block';
+        } else {
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
         function login() {
             const userType = document.getElementById('userType').value;
             const password = document.getElementById('password').value;
@@ -164,18 +171,19 @@
             }
         }
 
-        // 更改密码函数
         function changePassword() {
             const newPassword = document.getElementById('newPassword').value;
+            if (newPassword.length < 6) {
+                alert('密码长度至少为6个字符');
+                return;
+            }
             userPassword = newPassword;
-            // 将新密码存储到 localStorage
             localStorage.setItem('userPassword', newPassword);
             alert('用户密码已更改。');
             document.getElementById('changePasswordForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         }
 
-        // 原有故障排查系统的代码
         let currentStep = 0;
         let problemSteps = [];
 
@@ -248,20 +256,17 @@
             document.getElementById('steps').style.display = 'none';
         }
 
-        // 支持使用 Enter 键登录
         document.getElementById('password').addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
                 login();
             }
         });
 
-        // 返回用户登录后的最初界面
         function goBackToInitialPage() {
             document.getElementById('steps').style.display = 'none';
             document.getElementById('troubleshootingSystem').querySelector('#menu').style.display = 'none';
         }
 
-        // 退出登录
         function logout() {
             document.getElementById('changePasswordForm').style.display = 'none';
             document.getElementById('troubleshootingSystem').style.display = 'none';
