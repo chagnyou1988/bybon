@@ -153,6 +153,9 @@
             const userType = document.getElementById('userType').value;
             const password = document.getElementById('password').value;
 
+            // 每次登录时从本地存储获取最新的用户密码
+            userPassword = localStorage.getItem('userPassword') || '1234';
+
             if (userType === 'admin' && password === adminPassword) {
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('changePasswordForm').style.display = 'block';
@@ -237,7 +240,7 @@
                 currentStep++;
                 showStep();
             } else {
-                alert('故障排查已完成。如果问题仍然存在，请到店进一步检测。');
+                alert('故障排查已完成。如果问题仍然存在，请联系我们的技术支持团队。');
                 restartTroubleshooting();
             }
         }
