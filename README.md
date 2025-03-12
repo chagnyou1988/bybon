@@ -4,9 +4,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>故障排查系统</title>
+    <title> 故障排查系统 </title>
     <style>
-        /* 样式部分保持不变 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 350px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #00bfff;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        select,
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2b2b2b;
+            color: #e0e0e0;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00bfff;
+            color: #121212;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #009acd;
+        }
+
+        #menu {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #menu button {
+            margin-top: 10px;
+        }
+
+        /* 添加新样式，设置按钮之间的间隙和颜色区分 */
+        #steps button {
+            margin-top: 10px;
+        }
+
+        #steps button:nth-child(1) {
+            background-color: #00bfff;
+        }
+
+        #steps button:nth-child(1):hover {
+            background-color: #009acd;
+        }
+
+        #steps button:nth-child(2) {
+            background-color: #ff6347; /* 使用不同的颜色，这里选择了番茄红 */
+        }
+
+        #steps button:nth-child(2):hover {
+            background-color: #e5543c;
+        }
     </style>
 </head>
 
@@ -57,20 +143,18 @@
     </div>
 
     <script>
+        // 初始密码
         const adminPassword = 'bybon123';
-        let userPassword = localStorage.getItem('userPassword');
+        // 从 localStorage 获取用户密码，如果没有则使用默认值
+        let userPassword = localStorage.getItem('userPassword') || '1234';
 
-        if (!userPassword) {
-            alert("请管理员设置初始密码！");
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('changePasswordForm').style.display = 'block';
-        } else {
-            document.getElementById('loginForm').style.display = 'block';
-        }
-
+        // 登录函数
         function login() {
             const userType = document.getElementById('userType').value;
             const password = document.getElementById('password').value;
+
+            // 每次登录时从本地存储获取最新的用户密码
+            userPassword = localStorage.getItem('userPassword') || '1234';
 
             if (userType === 'admin' && password === adminPassword) {
                 document.getElementById('loginForm').style.display = 'none';
@@ -83,32 +167,104 @@
             }
         }
 
+        // 更改密码函数
         function changePassword() {
             const newPassword = document.getElementById('newPassword').value;
-            if (newPassword.length < 6) {
-                alert('密码长度至少为6个字符');
-                return;
-            }
             userPassword = newPassword;
+            // 将新密码存储到 localStorage
             localStorage.setItem('userPassword', newPassword);
             alert('用户密码已更改。');
             document.getElementById('changePasswordForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         }
 
-        // 其他故障排查相关函数保持不变
+        // 原有故障排查系统的代码
+        let currentStep = 0;
+        let problemSteps = [];
 
+        function startTroubleshooting() {
+            const problemType = document.getElementById('problemType').value;
+            switch (problemType) {
+                case 'powerOn':
+                    problemSteps = [
+                        '确认手机电池是否有电，建议您尝试充电一段时间后再尝试开机。',
+                        '请按照您手机机型正确的强制重启步骤操作（不同品牌和型号的手机可能有所不同）。',
+                        '请确保使用的充电设备是原装或认证的，并且工作正常。',
+                        '如果以上步骤都无法解决问题，可能是系统问题，建议您尝试进入恢复模式进行系统修复或恢复出厂设置（注意提醒备份数据）。'
+                    ];
+                    break;
+                case 'shortBattery':
+                    problemSteps = [
+                        '请问您是否经常使用大量应用，尤其是那些在后台持续运行的应用程序？',
+                        '请通过手机内置的电池健康功能查看电池状态，判断是否需要更换电池。',
+                        '有时待机时间短可能是由于软件问题引起的，确保系统和应用程序都是最新版本。',
+                        '建议您开启省电模式或者调整屏幕亮度、自动锁屏时间等设置来延长电池寿命。'
+                    ];
+                    break;
+                case 'poorSignal':
+                    problemSteps = [
+                        '请问您所在的位置是否有信号覆盖的问题，比如地下室、偏远山区等？',
+                        '建议您开启并关闭飞行模式以重新搜索网络信号。',
+                        '请检查SIM卡是否安装正确，必要时可尝试重新插拔或更换SIM卡。',
+                        '若上述方法均无效，可能存在硬件问题，如天线损坏等，需进一步专业检测。'
+                    ];
+                    break;
+                case 'stillProblem':
+                    problemSteps = [
+                        '请详细描述之前维修的具体内容，包括更换了哪些部件以及进行了何种修理。',
+                        '请根据您的描述重现问题，确认具体的表现形式。',
+                        '如果客服无法解决，我们会及时将信息反馈给技术支持团队做深入分析。'
+                    ];
+                    break;
+                case 'shuaihuai':
+                    problemSteps = [
+                        '1。',
+                        '2。',
+                        '3。'
+                    ];
+                    break;
+            }
+            currentStep = 0;
+            showStep();
+            document.getElementById('steps').style.display = 'block';
+            document.getElementById('troubleshootingSystem').querySelector('#menu').style.display = 'block';
+        }
+
+        function showStep() {
+            const stepText = document.getElementById('stepText');
+            stepText.textContent = `步骤 ${currentStep + 1}: ${problemSteps[currentStep]}`;
+        }
+
+        function nextStep() {
+            if (currentStep < problemSteps.length - 1) {
+                currentStep++;
+                showStep();
+            } else {
+                alert('故障排查已完成。如果问题仍然存在，请联系我们的技术支持团队。');
+                restartTroubleshooting();
+            }
+        }
+
+        function restartTroubleshooting() {
+            currentStep = 0;
+            problemSteps = [];
+            document.getElementById('steps').style.display = 'none';
+        }
+
+        // 支持使用 Enter 键登录
         document.getElementById('password').addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
                 login();
             }
         });
 
+        // 返回用户登录后的最初界面
         function goBackToInitialPage() {
             document.getElementById('steps').style.display = 'none';
             document.getElementById('troubleshootingSystem').querySelector('#menu').style.display = 'none';
         }
 
+        // 退出登录
         function logout() {
             document.getElementById('changePasswordForm').style.display = 'none';
             document.getElementById('troubleshootingSystem').style.display = 'none';
